@@ -1,0 +1,15 @@
+1. --> Write a LEXER:
+		Detect only INTLIT, KEYWORDS, IDENTIFIERS, NEWLINE and WHITESPACES
+	
+		Keywords :
+			INT
+
+
+2. --> Writing a parser
+			Parser detect only var decl of type int at present.
+
+   --> Fixing some issue in lexer of not classify keywords as keywords
+
+   --> Updating Lexer
+   		Add functionailty to detect a assigment operator '='
+   		
