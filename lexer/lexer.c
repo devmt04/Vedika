@@ -61,6 +61,7 @@ Token *new_token(){
 		}
 		break;
 	}// End - Handling whitespaces
+
 	if(lexeme == '\n'){
 		/*
 		In our case, we treat a newline charcter
@@ -71,6 +72,20 @@ Token *new_token(){
 		linepos = 0;
 
 		token->kind = TK_NEWLINE;
+		return token;
+	}
+
+	//Handling Assigment Operators
+	else if(lexeme == '='){
+		linepos++;
+
+		token->kind = TK_ASOP_EQ;
+		token->linepos = linepos;
+		token->lineno = lineno;
+
+		linepos++;
+		offset=0;
+
 		return token;
 	}
 

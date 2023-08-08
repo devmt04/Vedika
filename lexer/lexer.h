@@ -1,7 +1,7 @@
 #ifndef LEXER_H
 #define LEXER_H
 
-#include <stdio.h> 
+//#include <stdio.h> 
 
 typedef enum {
 	TK_KW = 1, 
@@ -35,6 +35,5 @@ typedef struct Token {
 
 // funtion prototypes
 Token *lexer();
-
 
 #endif
