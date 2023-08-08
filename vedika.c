@@ -54,25 +54,6 @@ int main(int argc, char *argv[]){
 			free(token);
 			printf("EOF, exiting");
 			break;
-<<<<<<< HEAD
-		}else{
-			printf("Token kind : %d\n", token->kind);
-			if(token->kind == TK_INTLIT){
-				printf("Intlit value: %d\n", token->value);
-				printf("linepos: %d\n", token->linepos);
-				printf("lineno: %d\n\n", token->lineno);
-			}else if(token->kind == TK_ID){
-				printf("Token name: %s\n", token->name);
-				printf("linepos: %d\n", token->linepos);
-				printf("lineno: %d\n\n", token->lineno);
-			}else if(token->kind==TK_KW){
-				printf("Token value: %d\n", token->value);
-				printf("linepos: %d\n", token->linepos);
-				printf("lineno: %d\n\n", token->lineno);
-			}
-			free(token);
-=======
->>>>>>> parser
 		}
 
 		ParseTree *lastNode = (ParseTree *)malloc(sizeof(ParseTree));
