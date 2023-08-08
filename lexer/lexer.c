@@ -27,16 +27,11 @@ char scan (){
 }
 
 // classify given string as Keyword or Not a keyword
-int identify_keyword(char buf[128], int bufflen){
+int identify_keyword(char buf[128]){
 	// INT
-	char full_lexeme[bufflen];
-	
 	switch (*buf){
 		case 'i':
-			for(int i = 0;i < bufflen;i++){
-				full_lexeme[i] = *(buf+i);
-			}	
-			if(strcmp(full_lexeme, "int") == 0){
+			if(strcmp(buf, "int") == 0){
 				return KW_INT;
 			}
 		default:
@@ -66,6 +61,7 @@ Token *new_token(){
 		}
 		break;
 	}// End - Handling whitespaces
+
 	if(lexeme == '\n'){
 		/*
 		In our case, we treat a newline charcter
@@ -76,6 +72,20 @@ Token *new_token(){
 		linepos = 0;
 
 		token->kind = TK_NEWLINE;
+		return token;
+	}
+
+	//Handling Assigment Operators
+	else if(lexeme == '='){
+		linepos++;
+
+		token->kind = TK_ASOP_EQ;
+		token->linepos = linepos;
+		token->lineno = lineno;
+
+		linepos++;
+		offset=0;
+
 		return token;
 	}
 
@@ -120,13 +130,11 @@ Token *new_token(){
 		linepos++;
 		
 		char buf[128] = {0};//max length assumed to be 128 char
-		int bufflen = 0;
 		
 		for(int i = 0;; i++){
 			if(isalnum(lexeme) || '_' == lexeme){
 				buf[i] = lexeme;
 				lexeme = scan();
-				bufflen++;
 				offset++;
 			}else{
 				buf[i] = '\0'; //end of lexeme
@@ -138,7 +146,7 @@ Token *new_token(){
 		}
 
 		// if kw_status == 0, then it will not be a keyword
-		int kw_status = identify_keyword(buf, bufflen);
+		int kw_status = identify_keyword(buf);
 		if( kw_status > 0){
 			// It is a keyword
 			token->kind = TK_KW;
@@ -154,7 +162,7 @@ Token *new_token(){
 			// it have to be a identifer
 			// we will add it to symbol table in parsing phase
 			token->kind = TK_ID;
-			strncpy(token->name, buf, sizeof(token->name));
+			strcpy(token->name, buf);
 			token->linepos = linepos;
 			token->lineno = lineno;
 
