@@ -10,7 +10,7 @@ int linepos = 0;
 FILE *fp = NULL;
 
 int main(int argc, char *argv[]){
-	printf("%d--",sizeof('\t'));
+
 	char *filename = argv[1];
   	FILE *f = fopen(argv[1], "r");
 
@@ -35,8 +35,12 @@ int main(int argc, char *argv[]){
 				printf("Intlit value: %d\n", token->value);
 				printf("linepos: %d\n", token->linepos);
 				printf("lineno: %d\n\n", token->lineno);
-			}else if(token->kind == TK_KW || token->kind==TK_ID){
+			}else if(token->kind == TK_ID){
 				printf("Token name: %s\n", token->name);
+				printf("linepos: %d\n", token->linepos);
+				printf("lineno: %d\n\n", token->lineno);
+			}else if(token->kind==TK_KW){
+				printf("Token value: %d\n", token->value);
 				printf("linepos: %d\n", token->linepos);
 				printf("lineno: %d\n\n", token->lineno);
 			}
