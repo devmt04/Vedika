@@ -17,14 +17,33 @@ INT
 #include <ctype.h>
 #include "lexer.h"
 
+#define BUFFER_SIZE 4096
+
 extern FILE *fp;
 
 extern int lineno;
 extern int linepos;
 
-char scan (){
-	return fgetc(fp);
+char buffer[BUFFER_SIZE];
+size_t bufferPos = 0; // Current position in the buffer
+size_t bytesRead = 0; // Number of bytes read into the buffer
+
+
+char scan(){
+	// if the buffer is empty, read more data from the file
+	if(bufferPos >= bytesRead){
+		bytesRead = fread(buffer, 1, BUFFER_SIZE, fp);
+		bufferPos = 0;
+	}
+
+	//if no more data is avilable, return EOF
+	if(bytesRead == 0){
+		return EOF;
+	}
+
+	return buffer[bufferPos++];
 }
+
 
 // classify given string as Keyword or Not a keyword
 int identify_keyword(char buf[128]){
