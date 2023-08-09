@@ -1,7 +1,6 @@
 #ifndef LEXER_H
 #define LEXER_H
 
-//#include <stdio.h> 
 
 typedef enum {
 	TK_KW = 1, 
@@ -14,7 +13,6 @@ typedef enum {
 } TokenKind;
 
 
-
 enum Keywords { 
 	KW_NOTFOUND = 0, //if given lexeme is not a Keyword
 	KW_INT = 1,
@@ -23,7 +21,7 @@ enum Keywords {
 
 typedef struct Token {
 	TokenKind kind;
-	//struct Token *next;	// require for parser
+
 	union { // use union as these can never access simoultanously
 		int value; // use long long instead of int
 		char name[128]; //for ID's name
@@ -31,7 +29,6 @@ typedef struct Token {
      int lineno;
      int linepos;
 } Token;
-
 
 // funtion prototypes
 Token *lexer();

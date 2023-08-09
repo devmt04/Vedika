@@ -2,11 +2,11 @@
 Current Progress :
 
 Detect only INTLIT, KEYWORDS, IDENTIFIERS, NEWLINE 
-and WHITESPACES
+ WHITESPACES, =
 
 
 Detected Keywords :
-INT
+int
 
 */
 
@@ -17,21 +17,40 @@ INT
 #include <ctype.h>
 #include "lexer.h"
 
+#define BUFFER_SIZE 4096
+
 extern FILE *fp;
 
 extern int lineno;
 extern int linepos;
 
-char scan (){
-	return fgetc(fp);
+char buffer[BUFFER_SIZE];
+size_t bufferPos = 0; // Current position in the buffer
+size_t bytesRead = 0; // Number of bytes read into the buffer
+
+
+char scan(){
+	// if the buffer is empty, read more data from the file
+	if(bufferPos >= bytesRead){
+		bytesRead = fread(buffer, 1, BUFFER_SIZE, fp);
+		bufferPos = 0;
+	}
+
+	//if no more data is avilable, return EOF
+	if(bytesRead == 0){
+		return EOF;
+	}
+
+	return buffer[bufferPos++];
 }
+
 
 // classify given string as Keyword or Not a keyword
 int identify_keyword(char buf[128]){
 	// INT
 	switch (*buf){
 		case 'i':
-			if(strcmp(buf, "int") == 0){
+			if(memcmp(buf, "int", 3) == 0){
 				return KW_INT;
 			}
 		default:
@@ -41,8 +60,8 @@ int identify_keyword(char buf[128]){
 
 
 Token *new_token(){
-	int offset = 0; //offset for linepos, as linepos contain only
-					// start pos of lexeme
+	int offset = 0; // offset for linepos, as linepos represent only
+					// pos of 1st charcter of lexeme
 
 	char lexeme = scan();
 	Token *token = (Token *)malloc(sizeof(Token));
@@ -128,16 +147,19 @@ Token *new_token(){
 	else if(isalpha(lexeme) || '_' == lexeme){
 
 		linepos++;
-		
-		char buf[128] = {0};//max length assumed to be 128 char
+		int buffsize = 0;
+
+		char buf[128] = {0};//max length of id/kw assumed to be 128 char
 		
 		for(int i = 0;; i++){
 			if(isalnum(lexeme) || '_' == lexeme){
 				buf[i] = lexeme;
 				lexeme = scan();
 				offset++;
+				buffsize++;
 			}else{
 				buf[i] = '\0'; //end of lexeme
+				buffsize++;
 				//bufflen++;
 				// putback charcter
 				ungetc(lexeme, fp);
@@ -162,7 +184,9 @@ Token *new_token(){
 			// it have to be a identifer
 			// we will add it to symbol table in parsing phase
 			token->kind = TK_ID;
-			strcpy(token->name, buf);
+			
+			//strcpy(token->name, buf);
+			memcpy(token->name, buf, buffsize);
 			token->linepos = linepos;
 			token->lineno = lineno;
 

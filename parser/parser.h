@@ -42,15 +42,6 @@ typedef struct ParseTree {
 	struct ParseTree *nontermnode;
 } ParseTree;
 
-// Recusive-decent routine for vardecl
-
-typedef struct TreeReturnNode {
-	ParseTree *firstnode;
-//	ParseTree *tree2nd;
-	ParseTree *lastnode;
-} TreeReturnNode;
-
-TreeReturnNode *var_decl(Token *token, DataTypes vartype);
-TreeReturnNode *Parser(Token *token);
+ParseTree *Parser(Token *token);
 
 #endif

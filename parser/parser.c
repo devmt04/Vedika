@@ -3,7 +3,7 @@ Current Progress:
 	Detecting onlt Var declaration of type int.
 */
 
-/*
+
 
 /*
 EXAMPLE SYNTAX:
@@ -73,7 +73,7 @@ vardecl, fundecl, etc
 
 extern SymbolTable *table; //global symbol table
 
-TreeReturnNode *int_var_decl(){
+ParseTree *int_var_decl(){
 
 	/*
 				firstnode
@@ -110,18 +110,21 @@ TreeReturnNode *int_var_decl(){
 	ParseTree *tree1 = (ParseTree *)malloc(sizeof(ParseTree));
 	tree0->nontermnode = tree1;
 
-	DataTypes datatype = DT_INT;
+	//DataTypes datatype = DT_INT;
 	Token *nextToken = lexer();
 
 	if(nextToken->kind == TK_ID){
 		
-		char idName[128];
-		strcpy(idName, nextToken->name);
+		char idName[strlen(nextToken->name)+1];
+		memcpy(idName, nextToken->name, strlen(nextToken->name)+1);
+		
+		//strcpy(idName, nextToken->name);
 		free(nextToken);
 
 		tree1->termnode = (Node *)malloc(sizeof(Node));
 		tree1->termnode->LType = LF_ID;
-		strcpy(tree1->termnode->name, idName);
+		//strcpy(tree1->termnode->name, idName);
+		memcpy(tree1->termnode->name, idName, sizeof(idName));
 		//tree1->termnode->name = idName;
 
 		ParseTree *tree2 = (ParseTree *)malloc(sizeof(ParseTree));
@@ -144,13 +147,14 @@ TreeReturnNode *int_var_decl(){
 			tree2->nontermnode = NULL;
 
 			// return sub-ParseTree
-			TreeReturnNode *returnNode = (TreeReturnNode *)malloc(sizeof(TreeReturnNode));
-			returnNode->firstnode = tree0;
+			
+			//TreeReturnNode *returnNode = (TreeReturnNode *)malloc(sizeof(TreeReturnNode));
+			//returnNode->firstnode = tree0;
 			//returnNode->tree2nd = tree1;
-			returnNode->lastnode = tree2;
+			//returnNode->lastnode = tree2;
 
 
-			return returnNode;
+			return tree0;
 
 		}else if(nextToken->kind == TK_ASOP_EQ){
 
@@ -196,11 +200,11 @@ TreeReturnNode *int_var_decl(){
 				tree4->termnode->LType = LF_NEWLINE;
 				tree4->nontermnode = NULL;
 				
-				TreeReturnNode *returnNode = (TreeReturnNode *)malloc(sizeof(TreeReturnNode));
-				returnNode->firstnode = tree0;
-				returnNode->lastnode = tree4;
+				//TreeReturnNode *returnNode = (TreeReturnNode *)malloc(sizeof(TreeReturnNode));
+				//returnNode->firstnode = tree0;
+				//returnNode->lastnode = tree4;
 
-				return returnNode;
+				return tree0;
 
 			}else{
 				printf("SYNTAX-ERROR : EXPECTING A NL CHARCTER");
@@ -224,7 +228,7 @@ from main program and then build parse-tree for whole block of code
 in a single run.
 */
 
-TreeReturnNode *Parser(Token *token){
+ParseTree *Parser(Token *token){
 	switch (token->kind){
 		case TK_KW:
 			if(token->value == KW_INT){

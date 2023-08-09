@@ -12,4 +12,25 @@
 
    --> Updating Lexer
    		Add functionailty to detect a assigment operator '='
-   		
+
+
+3. --> Write a IRCode generator
+	
+   --> Updating Parser.c, Parser.h, Lexer.c
+
+   		Parser.c:
+   			. Change the return value of funtions from
+   			TreeReturnNode* to ParseTree*
+
+   			. substitute all strcmp() or strcpy() with
+   			memcmp() and memcpy()
+
+   		Parser.h
+   			. Remove code-block for strcture TreeReturnNode
+
+   		Lexer.c:
+   			. Replace Unbuffered input with Buffered input
+
+   			. substitute all strcmp() or strcpy() with
+   			memcmp() and memcpy()
+
