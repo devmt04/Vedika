@@ -12,4 +12,6 @@
 
    --> Updating Lexer
    		Add functionailty to detect a assigment operator '='
-   		
+
+
+3. -->in lexer.c : Replacing Unbuffered Input with Buffered one, in order to increasse efficency
