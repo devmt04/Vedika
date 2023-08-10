@@ -36,7 +36,10 @@ typedef struct Node {
 		int value; // use long long instead of int
 		char name[128]; //for ID's name
     }; 
-    // other attr for error traking
+
+    int lineno;
+    int linepos;
+    
 }Node;
 
 typedef struct ParseTree {

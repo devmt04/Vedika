@@ -16,10 +16,9 @@ typedef struct SymbolEntry {
 	char name[128];
 	DataTypes datatype;
 	int decl_status;	// 0 = uninitialised, 1 = initialized
+	int lineno;
+	int linepos;
 	// intlitdata, strlitdata
-
-	// other attr like lineno, pos, etc for error handling
-	//int uniqeID;
 	struct SymbolEntry *next;
 } SymbolEntry;
 
@@ -38,7 +37,7 @@ typedef struct SymbolTable {
 SymbolTable *createSymbolTable();
 void enterScope(SymbolTable *table);
 void exitScope(SymbolTable *table);
-void addSymbol(SymbolTable *table, const char *name, SymbolKind kind, int datatype, int decl_status);
+void addSymbol(SymbolTable *table, const char *name, SymbolKind kind, int datatype, int decl_status, int lineno, int linepos);
 SymbolEntry *findSymbol(SymbolTable *table, const char *name);
 
 
