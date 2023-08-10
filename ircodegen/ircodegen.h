@@ -1,7 +1,6 @@
 #ifndef IRCODEGEN_H
 #define IRCODEGEN_H
 
-#include "../parser/parser.h"
-void IRGen(ParseTree *tree);
+void irgen_glob_int_var_decl(int decl_status, char *idName, int data);
 
 #endif

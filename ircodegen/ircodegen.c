@@ -23,43 +23,16 @@ for syntax : int a = 45
 #include <string.h>	
 #include <stdlib.h>
 
-#include "../parser/parser.h"
 
 extern char filename[128];
 
-void irgen_glob_var_int(ParseTree *parsetree);
+
 void write_ircode(char ircode[4096]);
-void IRGen(ParseTree *tree);
 
-void IRGen(ParseTree *tree){
-	// Identify type of declaration or statement or codeblock
-	
-	/* a var decl can be identified, if it starts with
-	 	a datatye kind keyword like int. */  
-
-	if(tree->termnode->TType == TREE_VARDECL){
-		switch (tree->termnode->value){
-			case DT_INT:
-				/* If the TType == TREE_FUNC_DECL
-				then we declare local variables,
-				till then we are in global scope so we have
-				to declare global var */
-				irgen_glob_var_int(tree);
-				break;
-			default:
-				printf("IRGen error");
-
-		}
-	}
-
-}
-
-
-
-void irgen_glob_var_int(ParseTree *parsetree){
+void irgen_glob_int_var_decl(int decl_status, char *idName, int data){
 	/*
 	|| alloc_glob int a
-	|| mov intlit, a
+	|| mov int-data, a
 	*/
 
 	/* Later we will change mov with something like
@@ -71,33 +44,30 @@ void irgen_glob_var_int(ParseTree *parsetree){
 	   A SPECIFIC BLOCK OF CODE LIKE IN ASSEMBLY
 	   WE HAVE .section .data PORTION */
 
-	ParseTree *tree = parsetree;
-
-	/* AT PRESENT WE ASSUMED THE GLOBAL VAR ARE
-	   ALREADY INITIALIZED BY PROGRAMMER */
-
 	char ircode_buf[4096] = {0};
-	
-	char idName[strlen(tree->nontermnode->termnode->name)];
-	memcpy(idName, tree->nontermnode->termnode->name, sizeof(idName));
 	char ircode[1024] = {0};
 
-    sprintf(ircode, "alloc_glob int %s\n", idName);
-    int size_ircode = sizeof(ircode);
-    memcpy(ircode_buf, ircode, size_ircode);
+	if (decl_status == 0){
+		// UN-INITILIZED
+		sprintf(ircode, "alloc_glob int %s\n", idName);
+		int size_ircode = strlen(ircode); 
+		memcpy(ircode_buf, ircode, size_ircode);
+		ircode_buf[size_ircode+1] = '\0';
+	}else{
+		sprintf(ircode, "alloc_glob int %s\n", idName);
+		int size_ircode = strlen(ircode); 
+		memcpy(ircode_buf, ircode, size_ircode);
 
-    int data = tree->nontermnode->nontermnode->nontermnode->termnode->value;
-    sprintf(ircode, "mov %d, %s\n", data, idName);
-    memcpy(ircode_buf + size_ircode, ircode, sizeof(ircode));
-
-
+		sprintf(ircode, "mov %d, %s\n", data, idName);
+		memcpy(ircode_buf + size_ircode, ircode, strlen(ircode));
+		ircode_buf[size_ircode+strlen(ircode)+1] = '\0';
+	}
     write_ircode(ircode_buf);
-
-
 }
 
 
-void write_ircode(char ircode[4096]){
+
+void write_ircode(char *ircode){
 
 	FILE *file = fopen("ir.code", "a+");
 

@@ -9,37 +9,53 @@
 
 extern SymbolTable *table;
 
+void var_decl_sem_check(ParseTree *tree);
+
 void semantic_check(ParseTree *tree){
+
 	if(tree->termnode->TType == TREE_VARDECL){
-		// CHECK IF VAR IS ALREADY DECLARED OR NOT
-		// Our Compiler will not allow the redeclaration of variables
-		char idName[strlen(tree->nontermnode->termnode->name)+1]; 
-		memcpy(idName, tree->nontermnode->termnode->name, sizeof(idName));
-		
-		SymbolEntry *symbol = findSymbol(table, idName);
-		if (symbol != NULL){
-			printf("Identifer %s already declared at %d:%d in file", symbol->name, symbol->linepos, symbol->lineno);
-			//printf("ERROR: You cannot redeclare %s variable again\n", symbol->name);
-			exit(-1);
-		}else {
-			/* DECLARE THAT VARIABLE */
-			int linepos = tree->nontermnode->termnode->linepos;
-			int lineno = tree->nontermnode->termnode->lineno;
-			addSymbol(table, idName, VAR_ID, DT_INT, 0, lineno, linepos);
-			IRGen(tree);
-		}
-
-
-
-		DataTypes datatype = tree->termnode->value;
-		
-		
-		
-
+		var_decl_sem_check(tree);
 	}
 
 	else if(tree->termnode->TType == TREE_INITVAR){
 
+	}
+}
+
+
+void var_decl_sem_check(ParseTree *tree){
+	// CHECK IF VAR IS ALREADY DECLARED OR NOT
+	// Our Compiler will not allow the redeclaration of variables
+	char idName[strlen(tree->nontermnode->termnode->name)+1]; 
+	memcpy(idName, tree->nontermnode->termnode->name, sizeof(idName));
+	DataTypes datatype = tree->termnode->value;
+
+	SymbolEntry *symbol = findSymbol(table, idName);
+	
+	if (symbol != NULL){
+		printf("Identifer %s already declared at %d:%d in file.c", symbol->name, symbol->linepos, symbol->lineno);
+		exit(-1);
+	}else {
+		/* DECLARE THAT VARIABLE */
+		int linepos = tree->nontermnode->termnode->linepos;
+		int lineno = tree->nontermnode->termnode->lineno;
+		
+		if(datatype == DT_INT){
+			// CHECKING IF VAR IS INITILIZED OR UNINITILIZED
+			if(tree->nontermnode->nontermnode->termnode->LType == LF_DECL_TERM){
+				// UN-INITILIZED
+				addSymbol(table, idName, VAR_ID, DT_INT, 0, lineno, linepos);
+				irgen_glob_int_var_decl(0, idName, 0);
+			}else{
+				// INITILIZED
+				addSymbol(table, idName, VAR_ID, DT_INT, 1, lineno, linepos);
+				irgen_glob_int_var_decl(1, idName, tree->nontermnode->nontermnode->nontermnode->termnode->value);
+			}
+		}
+
+		else {
+			// Other datatype
+		}
 	}
 }
 

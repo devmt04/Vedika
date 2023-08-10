@@ -1,13 +1,3 @@
-alloc_glob int a
 alloc_glob int d
-alloc_glob int d
-alloc_glob int d
-alloc_glob int d
-alloc_glob int d
-alloc_glob int d
-alloc_glob int d
-alloc_glob int d
-alloc_glob int d
-alloc_glob int d
-alloc_glob int d
-alloc_glob int d
+mov 5, d
+alloc_glob int q

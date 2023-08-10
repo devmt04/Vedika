@@ -52,8 +52,7 @@ int main(int argc, char *argv[]){
 
 		ParseTree *tree = Parser(token);
 		semantic_check(tree);
-		/* IR CODEGEN STARTS FROM HERE */
-  		//IRGen(tree);
+		//sematic_check will also produce IR-Code
 	}
 
 	fclose(f);

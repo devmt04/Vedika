@@ -39,3 +39,19 @@
 
    			. substitute all strcmp() or strcpy() with
    			memcmp() and memcpy()
+
+
+4. --> Successfully screwed branch IRGen >-<
+	
+   --> Improve lexer, parser, symboltable, IR-code genrator
+   		Lexer:
+   			* Fix putback-charcter funtion
+   		Parser:
+   			* Extend Funtionality to parse VAR_INITILISATION
+   			* Updating each node of ParseTree with lineno and linepos
+   		SymnolTable
+   			* Update SymbolEntry with linepos, and lineno for better error-handling
+
+   --> Add funtions for sematic analysis
+
+   		* Symatic Analysis of Global_Var_Declaration
