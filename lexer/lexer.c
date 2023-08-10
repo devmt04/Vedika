@@ -28,8 +28,15 @@ char buffer[BUFFER_SIZE];
 size_t bufferPos = 0; // Current position in the buffer
 size_t bytesRead = 0; // Number of bytes read into the buffer
 
+char last_read_char = -1;
 
 char scan(){
+	if (last_read_char != -1) {
+        char c = last_read_char;
+        last_read_char = -1;  // Reset the value
+        return c;
+    }
+
 	// if the buffer is empty, read more data from the file
 	if(bufferPos >= bytesRead){
 		bytesRead = fread(buffer, 1, BUFFER_SIZE, fp);
@@ -42,6 +49,15 @@ char scan(){
 	}
 
 	return buffer[bufferPos++];
+}
+
+
+void unget_buffered(char c) {
+    if (last_read_char == -1) {
+        last_read_char = c;
+    } else {
+        // Handle the case where you're attempting to unget more than one character
+    }
 }
 
 
@@ -131,7 +147,7 @@ Token *new_token(){
 				// Putback charcter that we fetched in advanced
 				// to check if next carcter is also a intlit
 				// or something eles
-				ungetc(next, fp);
+				unget_buffered(next);
 				return token;
 			}else{
 				// there is no token which start with digits
@@ -162,7 +178,7 @@ Token *new_token(){
 				buffsize++;
 				//bufflen++;
 				// putback charcter
-				ungetc(lexeme, fp);
+				unget_buffered(lexeme);
 				break;
 			}
 		}

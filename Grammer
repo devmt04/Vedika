@@ -1,0 +1,23 @@
+program --> decls
+
+decls -->   decl
+		  | decls
+
+decl -->   vardecl
+		 | varinit
+
+-----------------------------------------------
+vardecl -->   datatype idName ("\n"|"EOF")
+		    | datatype idName "=" data ("\n"|"EOF")
+
+      
+      datatype --> int
+      idName --> ***STANDARD CONVENTIONS***
+
+-----------------------------------------------
+
+varinit --> idName "=" data ("\n"|EOF)
+
+***idName MUST BE PRESENT IN SYMBOL TABLE***
+
+-----------------------------------------------

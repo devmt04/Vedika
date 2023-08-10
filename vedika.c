@@ -6,6 +6,7 @@
 #include "symtable/symtable.h"
 #include "parser/parser.h"
 #include "ircodegen/ircodegen.h"
+#include "analysis/semantic.h"
 
 int lineno = 1;
 int linepos = 0;
@@ -39,15 +40,20 @@ int main(int argc, char *argv[]){
 	while(1){
 
 		Token *token = lexer();
+		
 		if(token->kind == TK_EOF){
 			free(token);
 			printf("EOF, exiting");
 			break;
+		}else if(token->kind == TK_NEWLINE){
+			free(token);
+			continue;
 		}
 
 		ParseTree *tree = Parser(token);
+		//semantic_check(tree);
 		/* IR CODEGEN STARTS FROM HERE */
-  		IRGen(tree);
+  		//IRGen(tree);
 	}
 
 	fclose(f);

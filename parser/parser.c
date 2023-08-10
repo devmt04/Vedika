@@ -69,9 +69,110 @@ vardecl, fundecl, etc
 
 #include "../lexer/lexer.h"
 #include "parser.h"
-#include "../symtable/symtable.h"
 
-extern SymbolTable *table; //global symbol table
+ParseTree *int_var_decl();
+ParseTree *var_init(Token *token);
+
+/*
+Our parser will fetch up the 1st token of an statement or declaration ot code block
+from main program and then build parse-tree for whole block of code
+in a single run.
+*/
+
+ParseTree *Parser(Token *token){
+	switch (token->kind){
+		case TK_KW:
+			if(token->value == KW_INT){
+				free(token);
+				return int_var_decl();
+			}
+
+		case TK_ID:
+			/* VAR ASSIGMENT or INITILISATION */
+			return var_init(token);
+		default:
+			printf("No expected tokens, exiting\n");
+			exit(-1);
+			//more keyword starting from here according to grammer
+		//case TK_ID:
+	}
+}
+
+
+ParseTree *var_init(Token *token){
+	char idName[strlen(token->name)+1];
+	memcpy(idName, token->name, strlen(token->name)+1);
+	free(token);
+
+	/* Grammer: 
+		varinit --> idName "=" data ("\n"|EOF) */
+
+	/*
+		Tree Strcutre:
+
+	*/
+	ParseTree *tree0 = (ParseTree *)malloc(sizeof(ParseTree));
+	tree0->termnode = (Node *)malloc(sizeof(Node));
+	tree0->termnode->TType = TREE_INITVAR;
+
+	memcpy(tree0->termnode->name, idName, sizeof(idName));
+
+	ParseTree *tree1 = (ParseTree *)malloc(sizeof(ParseTree));
+	tree0->nontermnode = tree1;
+
+	Token *nextToken = lexer();
+
+	if(nextToken->kind == TK_ASOP_EQ){
+		free(nextToken);
+		tree1->termnode = (Node *)malloc(sizeof(Node));
+		tree1->termnode->LType = LF_ASOP_EQ;
+		
+		ParseTree *tree2 = (ParseTree *)malloc(sizeof(ParseTree));
+		tree1->nontermnode = tree2;
+
+		nextToken = lexer();
+
+		if(nextToken->kind==TK_INTLIT){ //or other datatype
+			int value = nextToken->value;
+			
+			switch(nextToken->kind){
+			
+				case TK_INTLIT:
+					free(nextToken);
+					tree2->termnode = (Node *)malloc(sizeof(Node));
+					tree2->termnode->LType = LF_INTLIT;
+					tree2->termnode->value = value;
+					break;
+			}
+
+			ParseTree *tree3 = (ParseTree *)malloc(sizeof(ParseTree));
+			tree2->nontermnode = tree3;
+
+			nextToken = lexer();
+			if(nextToken->kind == TK_NEWLINE || nextToken->kind == TK_EOF){
+				free(token);
+				tree3->termnode = (Node *)malloc(sizeof(Node));
+				tree3->termnode->LType = LF_DECL_TERM;
+				tree3->nontermnode = NULL;
+
+				return tree0;
+			}else{
+				// expr
+				printf("expecting a newline charct at the end of expr");
+			}
+
+		}else{
+			printf("Invalid token type after '='");
+		}
+
+	}else{
+		printf("Syntax error, expecting a '=' after name of identifier");
+	}
+
+}
+
+
+
 
 ParseTree *int_var_decl(){
 
@@ -101,7 +202,7 @@ ParseTree *int_var_decl(){
 	ParseTree *tree0 = (ParseTree *)malloc(sizeof(ParseTree));
 	tree0->termnode = (Node *)malloc(sizeof(Node));
 	tree0->termnode->TType = TREE_VARDECL;
-
+	
 	// there are 2 possible way according to our grammer
 	// to declare variables that is
 	// type ID | type ID = data
@@ -114,7 +215,7 @@ ParseTree *int_var_decl(){
 	Token *nextToken = lexer();
 
 	if(nextToken->kind == TK_ID){
-		
+	
 		char idName[strlen(nextToken->name)+1];
 		memcpy(idName, nextToken->name, strlen(nextToken->name)+1);
 		
@@ -133,30 +234,20 @@ ParseTree *int_var_decl(){
 		nextToken = lexer();
 
 		if(nextToken->kind == TK_NEWLINE || nextToken->kind == TK_EOF){
-			// uninitialized value in symbol table
-			// currently we are in global scope so
-			// symbol gonna add in global scope only
-			// global symbol table
 			free(nextToken);
-
-			addSymbol(table, idName, VAR_ID, DT_NA); //?
-
+	
 			tree2->termnode = (Node *)malloc(sizeof(Node));
 
-			tree2->termnode->LType = LF_NEWLINE;
+			tree2->termnode->LType = LF_DECL_TERM;
 			tree2->nontermnode = NULL;
 
 			// return sub-ParseTree
 			
-			//TreeReturnNode *returnNode = (TreeReturnNode *)malloc(sizeof(TreeReturnNode));
-			//returnNode->firstnode = tree0;
-			//returnNode->tree2nd = tree1;
-			//returnNode->lastnode = tree2;
-
-
 			return tree0;
 
-		}else if(nextToken->kind == TK_ASOP_EQ){
+		}
+
+		else if(nextToken->kind == TK_ASOP_EQ){
 
 			free(nextToken);
 
@@ -164,7 +255,6 @@ ParseTree *int_var_decl(){
 			tree2->termnode->LType = LF_ASOP_EQ;
 			
 			ParseTree *tree3 = (ParseTree *)malloc(sizeof(ParseTree));
-		//	tree2->nontermnode = (ParseTree *)malloc(sizeof(ParseTree));
 			tree2->nontermnode = tree3;
 
 			// next token may contain expr or data
@@ -172,8 +262,9 @@ ParseTree *int_var_decl(){
 			// that with other funtion
 
 			nextToken = lexer();
+
+			int data = nextToken->value;
 			if(nextToken->kind == TK_INTLIT){
-				int data = nextToken->value;
 				free(nextToken);
 			}else{
 				printf("Error, expecting a intlit");
@@ -183,26 +274,22 @@ ParseTree *int_var_decl(){
 
 			tree3->termnode = (Node *)malloc(sizeof(Node));
 			tree3->termnode->LType = LF_INTLIT;
+			tree3->termnode->value = data;
+
 			ParseTree *tree4 = (ParseTree *)malloc(sizeof(ParseTree));
 			tree3->nontermnode = tree4;
 
 			nextToken = lexer();
+			
 			if(nextToken->kind == TK_NEWLINE || nextToken->kind == TK_EOF){
 				free(nextToken);
 				// it is NOT a expr
 				// data = token value is confirmed
-				// save datatype, idName, data it holds
-				// in symbol table
-				addSymbol(table, idName, VAR_ID, DT_INT);
 
 				// maybe we want to initilize each Node too?
 				tree4->termnode = (Node *)malloc(sizeof(Node));
-				tree4->termnode->LType = LF_NEWLINE;
+				tree4->termnode->LType = LF_DECL_TERM;
 				tree4->nontermnode = NULL;
-				
-				//TreeReturnNode *returnNode = (TreeReturnNode *)malloc(sizeof(TreeReturnNode));
-				//returnNode->firstnode = tree0;
-				//returnNode->lastnode = tree4;
 
 				return tree0;
 
@@ -222,24 +309,9 @@ ParseTree *int_var_decl(){
 
 }
 
-/*
-Our parser will fetch up the 1st token of an statement or declaration ot code block
-from main program and then build parse-tree for whole block of code
-in a single run.
-*/
 
-ParseTree *Parser(Token *token){
-	switch (token->kind){
-		case TK_KW:
-			if(token->value == KW_INT){
-				free(token);
-				return int_var_decl();
-			}
-			break;
-		default:
-			printf("No expected tokens, exiting\n");
-			exit(-1);
-			//more keyword starting from here according to grammer
-		//case TK_ID:
-	}
-}
+
+/*
+
+			
+*/

@@ -1,1 +1,9 @@
-alloc_glob int id
+alloc_glob int a
+alloc_glob int d
+alloc_glob int d
+alloc_glob int d
+alloc_glob int d
+alloc_glob int d
+alloc_glob int d
+alloc_glob int d
+alloc_glob int d

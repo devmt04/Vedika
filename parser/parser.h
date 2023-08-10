@@ -6,6 +6,7 @@
 typedef enum {
 	TREE_PROGRAM = 0, //TOP-NODE
 	TREE_VARDECL = 1,
+	TREE_INITVAR = 2,
 } TreeType;
 
 typedef enum {
@@ -20,8 +21,9 @@ typedef enum {
 	LF_INTLIT = 3, 
 	LF_ASOP_EQ = 4, 
 	LF_AROP_PLUS = 5,
-	LF_NEWLINE = 6,
-	LF_EOF = 0
+	//LF_NEWLINE = 6,
+	//LF_EOF = 0
+	LF_DECL_TERM = 0 //declaration termination
 } LeafType;
 
 typedef struct Node {

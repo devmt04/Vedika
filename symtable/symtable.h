@@ -15,6 +15,7 @@ typedef struct SymbolEntry {
 	SymbolKind kind;	// 0 for Variable_ID 
 	char name[128];
 	DataTypes datatype;
+	int decl_status;	// 0 = uninitialised, 1 = initialized
 	// intlitdata, strlitdata
 
 	// other attr like lineno, pos, etc for error handling
@@ -37,7 +38,7 @@ typedef struct SymbolTable {
 SymbolTable *createSymbolTable();
 void enterScope(SymbolTable *table);
 void exitScope(SymbolTable *table);
-void addSymbol(SymbolTable *table, const char *name, SymbolKind kind, int datatype);
+void addSymbol(SymbolTable *table, const char *name, SymbolKind kind, int datatype, int decl_status);
 SymbolEntry *findSymbol(SymbolTable *table, const char *name);
 
 

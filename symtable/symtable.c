@@ -27,11 +27,12 @@ void exitScope(SymbolTable *table){
 	}
 }
 
-void addSymbol(SymbolTable *table, const char name[128], SymbolKind kind, int datatype){
+void addSymbol(SymbolTable *table, const char name[128], SymbolKind kind, int datatype, int decl_status){
 	SymbolEntry *newSymbol = (SymbolEntry *)malloc(sizeof(SymbolEntry));
 	strcpy(newSymbol->name, name);
 	newSymbol->kind = kind;
 	newSymbol->datatype = datatype;
+	newSymbol->decl_status = decl_status;
 	newSymbol->next = table->currentScope->symbolList;
 	table->currentScope->symbolList = newSymbol;
 }
