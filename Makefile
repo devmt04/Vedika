@@ -1,7 +1,7 @@
 .DEAFULT_GOAL := vedika
 
 CC = gcc
-SRCS = vedika.c lexer/lexer.c parser/parser.c symtable/symtable.c
+SRCS = vedika.c lexer/lexer.c parser/parser.c symtable/symtable.c ircodegen/ircodegen.c
 
 vedika : $(SRCS)
 	$(CC) $^ -o $@
