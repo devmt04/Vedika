@@ -88,6 +88,8 @@ ParseTree *Parser(Token *token){
 
 		case TK_ID:
 			/* VAR ASSIGMENT or INITILISATION */
+			// or
+			// funtion calling
 			return var_init(token);
 		default:
 			printf("No expected tokens, exiting\n");
@@ -101,7 +103,7 @@ ParseTree *Parser(Token *token){
 ParseTree *var_init(Token *token){
 	char idName[strlen(token->name)+1];
 	memcpy(idName, token->name, strlen(token->name)+1);
-
+	
 	/* Grammer: 
 		varinit --> idName "=" data ("\n"|EOF) */
 
@@ -116,11 +118,11 @@ ParseTree *var_init(Token *token){
 	memcpy(tree0->termnode->name, idName, sizeof(idName));
 	tree0->termnode->lineno = token->lineno;
 	tree0->termnode->linepos = token->linepos;
-
+	free(token);
 	ParseTree *tree1 = (ParseTree *)malloc(sizeof(ParseTree));
 	tree0->nontermnode = tree1;
 
-	free(token);
+	
 	Token *nextToken = lexer();
 
 	if(nextToken->kind == TK_ASOP_EQ){
@@ -130,11 +132,12 @@ ParseTree *var_init(Token *token){
 
 		tree1->termnode->lineno = nextToken->lineno;
 		tree1->termnode->linepos = nextToken->linepos;
-
+		free(nextToken);
+		
 		ParseTree *tree2 = (ParseTree *)malloc(sizeof(ParseTree));
 		tree1->nontermnode = tree2;
 
-		free(nextToken);
+		
 		nextToken = lexer();
 
 		if(nextToken->kind==TK_INTLIT){ //or other datatype
@@ -178,6 +181,7 @@ ParseTree *var_init(Token *token){
 
 	}else{
 		printf("Syntax error, expecting a '=' after name of identifier");
+		// EXPECT A FUNTION CALL
 	}
 
 }

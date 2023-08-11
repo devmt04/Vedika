@@ -27,7 +27,18 @@ for syntax : int a = 45
 extern char filename[128];
 
 
-void write_ircode(char ircode[4096]);
+//void write_ircode(char ircode[4096]);
+void write_ircode(char *ircode);
+
+void irgen_glob_int_var_init(char *idName, int data){
+	/*
+		|| mov data, idName
+	*/
+	
+	char ircode[1024] = {0};
+	sprintf(ircode, "mov %d, %s\n", data, idName);
+    write_ircode(ircode);	
+}
 
 void irgen_glob_int_var_decl(int decl_status, char *idName, int data){
 	/*
@@ -62,13 +73,13 @@ void irgen_glob_int_var_decl(int decl_status, char *idName, int data){
 		memcpy(ircode_buf + size_ircode, ircode, strlen(ircode));
 		ircode_buf[size_ircode+strlen(ircode)+1] = '\0';
 	}
+
     write_ircode(ircode_buf);
 }
 
 
 
 void write_ircode(char *ircode){
-
 	FILE *file = fopen("ir.code", "a+");
 
     if (file == NULL) {

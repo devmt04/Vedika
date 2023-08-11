@@ -1,3 +1,4 @@
 alloc_glob int d
 mov 5, d
 alloc_glob int q
+mov 6, q

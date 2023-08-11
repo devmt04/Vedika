@@ -1,2 +1,4 @@
 int d = 5
+
 int q
+q = 6

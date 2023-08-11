@@ -10,18 +10,52 @@
 extern SymbolTable *table;
 
 void var_decl_sem_check(ParseTree *tree);
+void var_init_sem_chk(ParseTree *tree);
 
-void semantic_check(ParseTree *tree){
-
-	if(tree->termnode->TType == TREE_VARDECL){
-		var_decl_sem_check(tree);
-	}
-
-	else if(tree->termnode->TType == TREE_INITVAR){
-
+//free memory of tree-heap
+void free_Tree(ParseTree *tree){
+	ParseTree *node = tree;
+	Node *leaf = tree->termnode;
+	while(1){
+		ParseTree *nextNT = node->nontermnode;	//next non-terminal
+		free(leaf);
+		free(node);
+		if(nextNT == NULL){
+			break;
+		}
+		node = nextNT;
+		leaf = node->termnode;
 	}
 }
 
+void semantic_check(ParseTree *tree){
+	if(tree->termnode->TType == TREE_VARDECL){
+		var_decl_sem_check(tree);
+	}
+	else if(tree->termnode->TType == TREE_INITVAR){
+		var_init_sem_chk(tree);
+	}
+}
+
+void var_init_sem_chk(ParseTree *tree){
+	//Chk if it is declared or NOT
+	// it may declared globally or locally so Chk wisely
+	char idName[strlen(tree->termnode->name)+1];
+	memcpy(idName, tree->termnode->name, sizeof(idName));
+
+	SymbolEntry *symbol = findSymbol(table, idName);
+	
+	if (symbol != NULL){
+		DataTypes datatype = symbol->datatype;
+		//TYPE CHECKING
+		int data = tree->nontermnode->nontermnode->termnode->value;
+		irgen_glob_int_var_init(idName, data);		
+
+	}else {
+		printf("Identifer %s is unknown, seeing it first time without any declarations at %d:%d", idName, tree->termnode->lineno, tree->termnode->linepos);
+		exit(-1);
+	}
+}
 
 void var_decl_sem_check(ParseTree *tree){
 	// CHECK IF VAR IS ALREADY DECLARED OR NOT
@@ -51,6 +85,7 @@ void var_decl_sem_check(ParseTree *tree){
 				addSymbol(table, idName, VAR_ID, DT_INT, 1, lineno, linepos);
 				irgen_glob_int_var_decl(1, idName, tree->nontermnode->nontermnode->nontermnode->termnode->value);
 			}
+			free_Tree(tree);
 		}
 
 		else {
