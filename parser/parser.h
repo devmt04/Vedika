@@ -7,6 +7,7 @@ typedef enum {
 	TREE_PROGRAM = 0, //TOP-NODE
 	TREE_VARDECL = 1,
 	TREE_INITVAR = 2,
+	TREE_FUNDECL = 3,
 } TreeType;
 
 typedef enum {
@@ -21,8 +22,13 @@ typedef enum {
 	LF_INTLIT = 3, 
 	LF_ASOP_EQ = 4, 
 	LF_AROP_PLUS = 5,
-	//LF_NEWLINE = 6,
-	//LF_EOF = 0
+	
+	LF_LPAREN = 6, 
+	LF_RPAREN = 7,  
+	LF_COLON = 8,  
+	LF_SEMICOLON = 9, 
+	LF_COMMA = 10,  // WILL NOT USED IN FUNTION PARSER TREE
+
 	LF_DECL_TERM = 0 //declaration termination
 } LeafType;
 
@@ -43,8 +49,16 @@ typedef struct Node {
 }Node;
 
 typedef struct ParseTree {
-	Node *termnode;
-	struct ParseTree *nontermnode;
+	
+	union{
+		Node *termnode;
+		struct ParseTree *subnontermnode;
+	};
+	union{
+		Node *subtermnode;
+		struct ParseTree *nontermnode;
+	};
+	
 } ParseTree;
 
 ParseTree *Parser(Token *token);

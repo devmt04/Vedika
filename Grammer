@@ -5,6 +5,7 @@ decls -->   decl
 
 decl -->   vardecl
 		 | varinit
+		 | funcdecl
 
 -----------------------------------------------
 vardecl -->   datatype idName ("\n"|"EOF")
@@ -20,4 +21,24 @@ varinit --> idName "=" data ("\n"|EOF)
 
 ***idName MUST BE PRESENT IN SYMBOL TABLE***
 
+-----------------------------------------------
+
+funcdecl --> "def" returntype idname "("stmts"):" decls ";"
+decls --> decl | decls
+
+stmts --> stmt | (',') stmts
+
+stmt --> type idName
+
+decl -->  vardecl
+	     | ifdecl
+	     | ifelsedecl
+	     | ifelseifdecl
+	     | whiledecl
+	     | fordecl
+	     | functioncall
+	     | returnstatement
+	     | globalvarinit
+	     | strcutdecl
+	     
 -----------------------------------------------

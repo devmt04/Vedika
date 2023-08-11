@@ -1,4 +1,12 @@
-int d = 5
+def int func():
+	int a = 5
+	return a
+	;
 
-int q
-q = 6
+
+@function
+func:
+	alloc int a
+	mov 5 a
+	ret a
+;

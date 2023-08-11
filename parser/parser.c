@@ -72,6 +72,7 @@ vardecl, fundecl, etc
 
 ParseTree *int_var_decl(Token *token);
 ParseTree *var_init(Token *token);
+ParseTree *func_decl(Token token);
 
 /*
 Our parser will fetch up the 1st token of an statement or declaration ot code block
@@ -84,6 +85,9 @@ ParseTree *Parser(Token *token){
 		case TK_KW:
 			if(token->value == KW_INT){
 				return int_var_decl(token);
+			}
+			else if(token->value == KW_DEF){
+				return func_decl(token);
 			}
 
 		case TK_ID:
@@ -99,6 +103,284 @@ ParseTree *Parser(Token *token){
 	}
 }
 
+
+ParseTree *func_decl(Token token){
+	/*
+		Tree will be like:
+				o
+			   / \
+		   "def"  o
+			 	 / \
+	    returntype  o
+				   / \
+	    	  idName  o
+	    	  		 / \
+	    	  	   '('  o
+	    	  	       / \
+	    	  (stmts) o   \
+					 / \   \
+			 (stmt) o   o   \
+				   /   / \   \
+				  /	stmt ...  \
+				 /             \
+				o               o
+			   / \ 			   / \
+		     type idname     ')'  o
+				           	     / \
+			       			   ':'  o
+								   / \
+                          (decls) o   \
+								 / \   \
+						        /   o   \
+						       /   / \   \
+						(decl)o  decl ... \
+						  	 / \           \
+                             ...            \
+                                             o
+											/ \
+										  ';'  o
+										      / \
+									'\n' | EOF	 NULL
+
+	*/
+
+	ParseTree *tree0 = (ParseTree *)malloc(sizeof(ParseTree));
+	tree0->termnode = (Node *)malloc(sizeof(Node));
+	
+	tree0->termnode->TType = TREE_FUNDECL;
+	tree0->termnode->value = KW_DEF;
+	tree0->termnode->lineno = token->lineno;
+	tree0->termnode->linepos = token->linepos;
+	free(token);
+
+	Token *nextToken = lexer();
+
+	if (nextToken->kind == TK_KW || nextToken->kinf == TK_ID) //OR OTHER DATATYPE OR USERDEFINED DATATYPES
+		{
+			ParseTree *tree1 = (ParseTree *)malloc(sizeof(ParseTree));
+			tree0->nontermnode = tree1;
+			tree1->termnode = (Node *)malloc(sizeof(Node));
+
+			// -----------------------------
+			tree1->termnode->LType = LF_KW;
+			tree1->termnode->value = DT_INT;
+			// -----------------------------
+			tree1->termnode->lineno = nextToken->lineno;
+			tree1->termnode->linepos = nextToken->linepos;
+
+			free(nextToken);
+			nextToken = lexer();
+
+			if (nextToken->kind == TK_ID){
+				ParseTree *tree2 = (ParseTree *)malloc(sizeof(ParseTree));
+				tree1->nontermnode = tree2;
+				tree2->termnode = (Node *)malloc(sizeof(Node));
+
+				tree2->termnode->LType = LF_ID;
+				memcpy(tree2->termnode->name, nextToken->name, strlen(nextToken->name)+1);
+				tree2->termnode->lineno = nextToken->lineno;
+				tree2->termnode->linepos = nextToken->linepos;
+				
+				free(nextToken);
+				nextToken = lexer();
+
+				if(nextToken->kind == TK_LPAREN){
+					ParseTree *tree3 = (ParseTree *)malloc(sizeof(ParseTree));
+					tree2->nontermnode = tree3;
+					tree3->termnode = (Node *)malloc(sizeof(Node));
+
+					tree3->termnode->LType = LF_LPAREN;
+					tree3->termnode->lineno = nextToken->lineno;
+					tree3->termnode->linepos = nextToken->linepos;
+
+					free(nextToken);
+
+					nextToken = lexer();
+
+					// handle stmts
+					ParseTree *tree4 = (ParseTree *)malloc(sizeof(ParseTree));
+					tree3->nontermnode = tree4;
+					
+					ParseTree *subnt = (ParseTree *)malloc(sizeof(ParseTree));
+					tree4->subnontermnode = subnt;
+					
+					if(nextToken->kind != TK_RPAREN){
+						// declare all statements here
+						// MAYBE WE WILL LOOK FOR CONTION IN SYMBOL TABLE
+						// MAYBE WE WILL MAKE A SEPRATE SYMTABLE FOR 
+						// KEYWORD AND USER DEFIEND DATATYPES
+						// either we can check for condtion here in parser
+						// or in sematic analysis
+						// but we gonna do it here for now 
+						while(1){
+
+							if(nextToken->kind == TK_KW ){ // or userdefined datatype
+								// LET ASSUME THE ARG DATATYPE IS int
+								int tempTokenType = DT_INT;
+								free(nextToken);							
+								nextToken = lexer();
+								if(nextToken->kind == TK_ID){
+									subnt->subnontermnode->termnode = (Node *)malloc(sizeof(Node));
+									subnt->subnontermnode->termnode->LType = LF_KW;
+									subnt->subnontermnode->termnode->value = tempTokenType;
+									subnt->subnontermnode->termnode->linepos = nextToken->linepos;
+									subnt->subnontermnode->termnode->lineno = nextToken->lineno;
+									
+
+									subnt->subnontermnode->subtermnode = (Node *)malloc(sizeof(Node));
+									subnt->subnontermnode->termnode->LType = LF_KW;
+									subnt->subnontermnode->termnode->value = tempTokenType;
+									subnt->subnontermnode->termnode->linepos = nextToken->linepos;
+									subnt->subnontermnode->termnode->lineno = nextToken->lineno;
+									
+
+
+								}else{
+									printf("Syntax Errir: invalid name of identifer in funtion arguments at %d:%d\n", nextToken->linepos, nextToken->lineno);
+									free(nextToken);
+									exit(-1);
+								}
+
+							}else{
+								printf("Unrecognized Datatype for funtion arguments at %d:%d\n", nextToken->linepos, nextToken->lineno);
+								free(nextToken);
+								exit(-1);
+							}
+						}
+
+
+					}else if(nextToken->kind == TK_RPAREN)
+					{
+						// furter chk here
+						tree4->subnontermnode->subnontermnode = NULL;
+						tree4->subnontermnode->nontermnode = NULL;
+
+					}else{
+						printf("Syntax ERROR: invalid token after '(' at %d:%d\n", nextToken->linepos, nextToken->lineno);
+						free(nextToken);
+						exit(-1);
+					}
+
+					ParseTree *tree5 = (ParseTree *)malloc(sizeof(ParseTree));
+					tree5->termnode = (Node *)malloc(sizeof(Node));
+					tree4->nontermnode = tree5;
+
+					tree5->termnode->LType = LF_RPAREN;
+					tree5->termnode->lineno = nextToken->lineno;
+					tree5->termnode->linepos = nextToken->linepos;
+
+					free(nextToken);
+
+					nextToken = lexer();
+
+					if(nextToken->kind == TK_COLON){
+						// Futer defination here
+					}else{
+						printf("Syntax Error: expecting a : in funtion declaration at %d:%d\n", nextToken->linepos, nextToken->lineno);
+						free(nextToken);
+						exit(-1);
+					}
+
+				}else{
+					printf("Syntax error after funtion-name in funtion declaration at %d:%d expecting a '('\n", nextToken->linepos, nextToken->lineno);
+					free(nextToken);
+					exit(-1);
+				}
+
+			}else{
+				printf("Token in funtion defination at %d:%d has an invalid identifer name\n", nextToken->lineno, nextToken->linepos);
+				free(nextToken);
+				exit(-1);
+			}
+		}else{
+			printf("Invalid return-type defined for funtion at %d:%d is not recognized by compiler\n");
+			free(nextToken);
+			exit(-1);
+		}
+
+	
+
+
+
+}
+
+
+/*
+
+							ParseTree *nextnt = (ParseTree *)malloc(sizeof(ParseTree));
+							ParseTree *subnt = tree4->subnontermnode;
+							
+							if(a == 0){
+								tree4->subnontermnode = nextnt;
+							}else{
+								subnt->nontermnode = nextnt;
+							}
+							tree4->subnontermnode->subnontermnode = (ParseTree *)malloc(sizeof(ParseTree));
+						
+							tree4->subnontermnode->subnontermnode->termnode = (Node *)malloc(sizeof(Node));
+							tree4->subnontermnode->subnontermnode->subtermnode = (Node *)malloc(sizeof(Node));
+
+							tree4->subnontermnode->subnontermnode->termnode->value = KW_INT; //nextToken->value;
+							memcpy(tree4->subnontermnode->subnontermnode->subtermnode->name, nextToken->name, strlen(nextToken->name)+1);
+							
+							free(nextToken);
+							nextToken = lexer();
+
+							// ----------------------
+							if(nextToken->kind == TK_COMMA){
+								subnt->nontermnode = (ParseTree *)malloc(sizeof(ParseTree));
+
+							}
+
+*/
+
+
+/*
+
+
+					if(nextToken->kind == TK_RPAREN){
+						ParseTree *tree5 = (ParseTree *)malloc(sizeof(ParseTree));
+						tree3->nontermnode = tree4;
+						tree5->termnode = (Node *)malloc(sizeof(Node));
+
+						tree4->termnode->LType = LF_RPAREN;
+						tree4->termnode->lineno = nextToken->lineno;
+						tree4->termnode->linepos = nextToken->linepos;
+
+						free(nextToken);
+
+						nextToken = lexer();
+
+						if(nextToken->kind == TK_COLON){
+							ParseTree *tree5 = (ParseTree *)malloc(sizeof(ParseTree));
+							tree5->termnode = (Node *)malloc(sizeof(Node));
+							tree4->nontermnode = tree5;
+
+							tree5->LType = LF_COLON;
+							tree5->termnode->lineno = nextToken->lineno;
+							tree5->termnode->linepos = nextToken->linepos;
+							
+							free(nextToken);
+
+							//handle decls
+							nextToken = lexer();
+
+
+						}else if(nextToken->kind == TK_SEMICOLON){
+							// THIS WILL BE A FUNTION PROTOTYPE THEN
+						}else{
+							printf("Syntax Error: invalid token type after ')' in funtion defination at %d:%d\n", nextToken->linepos, nextToken->lineno);
+							free(nextToken);
+							exit(-1);
+						}
+
+
+					}else{
+						printf("SyntaxError: was expecting a ')' in funtion declartion at %d:%d\n", nextToken->linepos, nextToken->lineno);
+						free(nextToken);
+						exit(-1);
+					}
+*/
 
 ParseTree *var_init(Token *token){
 	char idName[strlen(token->name)+1];
@@ -185,9 +467,6 @@ ParseTree *var_init(Token *token){
 	}
 
 }
-
-
-
 
 ParseTree *int_var_decl(Token *token){
 

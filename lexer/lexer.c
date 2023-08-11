@@ -62,12 +62,17 @@ void unget_buffered(char c) {
 
 
 // classify given string as Keyword or Not a keyword
-int identify_keyword(char buf[128]){
+//int identify_keyword(char buf[128]){
+int identify_keyword(char *buf){
 	// INT
 	switch (*buf){
 		case 'i':
 			if(memcmp(buf, "int", 3) == 0){
 				return KW_INT;
+			}
+		case 'd':
+			if(memcmp(buf, "def", 3)==0){
+				return KW_DEF;
 			}
 		default:
 			return KW_NOTFOUND;
@@ -109,8 +114,72 @@ Token *new_token(){
 		token->kind = TK_NEWLINE;
 		return token;
 	}
+	
+	else if(lexeme == '('){
+		linepos++;
 
-	//Handling Assigment Operators
+		token->kind = TK_LPAREN;
+		token->linepos = linepos;
+		token->lineno = lineno;
+
+		linepos++;
+		offset=0;
+
+		return token;
+	}
+
+	else if(lexeme == ','){
+		linepos++;
+
+		token->kind = TK_COMMA;
+		token->linepos = linepos;
+		token->lineno = lineno;
+
+		linepos++;
+		offset=0;
+
+		return token;
+	}
+
+	else if(lexeme == ')'){
+		linepos++;
+
+		token->kind = TK_RPAREN;
+		token->linepos = linepos;
+		token->lineno = lineno;
+
+		linepos++;
+		offset=0;
+
+		return token;
+	}
+
+	else if(lexeme == ':'){
+		linepos++;
+
+		token->kind = TK_COLON;
+		token->linepos = linepos;
+		token->lineno = lineno;
+
+		linepos++;
+		offset=0;
+
+		return token;
+	}
+
+	else if(lexeme == ';'){
+		linepos++;
+
+		token->kind = TK_SEMICOLON;
+		token->linepos = linepos;
+		token->lineno = lineno;
+
+		linepos++;
+		offset=0;
+
+		return token;
+	}
+	
 	else if(lexeme == '='){
 		linepos++;
 
