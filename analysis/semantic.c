@@ -11,6 +11,9 @@ extern SymbolTable *table;
 
 void var_decl_sem_check(ParseTree *tree);
 void var_init_sem_chk(ParseTree *tree);
+void semantic_check(ParseTree *tree);
+void free_Tree(ParseTree *tree);
+void func_decl_sem_chk(ParseTree *tree);
 
 //free memory of tree-heap
 void free_Tree(ParseTree *tree){
@@ -35,6 +38,38 @@ void semantic_check(ParseTree *tree){
 	else if(tree->termnode->TType == TREE_INITVAR){
 		var_init_sem_chk(tree);
 	}
+	else if(tree->termnode->TType == TREE_FUNDECL){
+		func_decl_sem_chk(tree);
+	}
+}
+
+void func_decl_sem_chk(ParseTree *tree){
+	// idName, returnType, exprTree, declTree
+	//char idName[strlen(tree->nontermnode->nontermnode->termnode->name)+1];
+	//memcpy(idName, tree->nontermnode->nontermnode->termnode->name, strlen(tree->nontermnode->nontermnode->termnode->name)+1);
+	char *idName = tree->nontermnode->nontermnode->termnode->name;
+	DataTypes returnType = tree->nontermnode->termnode->value;
+
+	// chk if funtion id is already used or not
+	SymbolEntry *symbol = findSymbol(table, idName);
+	if(symbol != NULL){
+		printf("SEMATIC ERROR: Funtion name %s is already used at %d:%d\n", idName, symbol->linepos, symbol->lineno);
+		// free the parse-tree
+		exit(-1);
+	}else{
+		addSymbol(table, idName, FUNC_ID, returnType, 1, tree->termnode->lineno, tree->termnode->linepos);
+		// THE TYPE CHING OF RETURN STATEMENT CAN BE
+		// DONE IN PARSING PHASE
+
+		// CURRENTLY W ARE NOT WORKING ON PROTOTYPES
+		// MAT BE WE NEED TO MENTION SCOPE OF DECLARION
+		// IN BELOW FUNTION
+		// irgen_func_decl(idName, returnType, argsTree, declsTree);
+		// we have to check sematics for return statements
+		irgen_func_decl(idName, returnType, tree->nontermnode->nontermnode->nontermnode->nontermnode->subnontermnode, tree->nontermnode->nontermnode->nontermnode->nontermnode->nontermnode->nontermnode->nontermnode->subnontermnode);
+	//	free_Tree(tree); //!
+	}
+
 }
 
 void var_init_sem_chk(ParseTree *tree){

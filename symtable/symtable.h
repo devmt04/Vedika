@@ -13,7 +13,7 @@ typedef enum {
 /* Define strcuures */
 typedef struct SymbolEntry {
 	SymbolKind kind;	// 0 for Variable_ID 
-	char name[128];
+	char name[128];		// we can malloc this for memory-efficency
 	DataTypes datatype;
 	int decl_status;	// 0 = uninitialised, 1 = initialized
 	int lineno;

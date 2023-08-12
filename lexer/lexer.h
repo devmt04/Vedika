@@ -18,13 +18,17 @@ typedef enum {
 	TK_COLON = 9,   // :
 	TK_SEMICOLON = 10, // ;
 	TK_COMMA = 11, // ,
+
+
 } TokenKind;
 
 
 enum Keywords { 
 	KW_NOTFOUND = 0, //if given lexeme is not a Keyword
 	KW_INT = 1,
-	KW_DEF = 2
+	KW_DEF = 2,
+	KW_RET = 3,
+	KW_ENDDEF = 4,
 };
 
 

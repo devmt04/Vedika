@@ -23,12 +23,38 @@ for syntax : int a = 45
 #include <string.h>	
 #include <stdlib.h>
 
+#include "ircodegen.h"
+#include "../parser/parser.h"
 
 extern char filename[128];
 
 
 //void write_ircode(char ircode[4096]);
 void write_ircode(char *ircode);
+
+void irgen_func_decl(char *idName, DataTypes returnType, ParseTree *argsTree, ParseTree *declsTree){
+	/*
+		@function
+		func:
+			alloc int a
+			mov 5 a
+			ret a
+		;
+	*/
+	char ircode_buf[4096] = {0};
+	char ircode[1024] = {0};
+
+	strcpy(ircode, "@funtion\n");
+	int size_ircode = strlen(ircode);
+	memcpy(ircode_buf, ircode, size_ircode);
+
+	sprintf(ircode, "%s:\n", idName);
+	size_ircode = strlen(ircode);
+	memcpy(ircode_buf+size_ircode, ircode, size_ircode);
+
+	ircode_buf[strlen(ircode_buf)+1] = '\0';
+
+}
 
 void irgen_glob_int_var_init(char *idName, int data){
 	/*

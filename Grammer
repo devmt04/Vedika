@@ -23,7 +23,7 @@ varinit --> idName "=" data ("\n"|EOF)
 
 -----------------------------------------------
 
-funcdecl --> "def" returntype idname "("stmts"):" decls ";"
+funcdecl --> "def" returntype idname "("stmts"):" decls "enddef"
 decls --> decl | decls
 
 stmts --> stmt | (',') stmts
@@ -42,3 +42,5 @@ decl -->  vardecl
 	     | strcutdecl
 	     
 -----------------------------------------------
+
+

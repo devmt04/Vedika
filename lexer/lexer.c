@@ -74,6 +74,15 @@ int identify_keyword(char *buf){
 			if(memcmp(buf, "def", 3)==0){
 				return KW_DEF;
 			}
+		case 'r':
+			if(memcmp(buf, "return", 6)==0){
+				return KW_RET;
+			}
+		case 'e':
+			if(memcmp(buf, "enddef", 6)==0){
+				return KW_ENDDEF;
+			}
+		
 		default:
 			return KW_NOTFOUND;
 	}
