@@ -55,3 +55,22 @@
    --> Add funtions for sematic analysis
 
    		* Symatic Analysis of Global_Var_Declaration
+
+
+5. --> Extend parser for parsing a function
+		
+		* add tree TREE_FUNDECL
+		
+		* Upadte Lexer
+
+			* ADD tokens ':', ',', ';', '(',  ')'
+			* ADD keyword 'def', 'enddef', 'return'
+
+		* Updare parser
+
+			* extend ParseTree datastrcture with subnonterminalnode
+				and subterminalnode for constructing better
+				parse tree
+
+
+		* Fix silly bugs
