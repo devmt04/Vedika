@@ -3,6 +3,6 @@
 
 #include "../parser/parser.h"
 
-void semantic_check(ParseTree *tree);
+int semantic_check(ParseTree *tree);
 
 #endif

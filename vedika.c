@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <time.h>
+
 #include "lexer/lexer.h"
 #include "symtable/symtable.h"
 #include "parser/parser.h"
@@ -37,8 +39,10 @@ int main(int argc, char *argv[]){
   
   	init_symtable();
 
-	while(1){
+  	clock_t start_time, end_time;
+  	double cpu_time_used;
 
+	while(1){
 		Token *token = lexer();
 		
 		if(token->kind == TK_EOF){
@@ -50,9 +54,23 @@ int main(int argc, char *argv[]){
 			continue;
 		}
 
+		start_time = clock();
 		ParseTree *tree = Parser(token);
-		semantic_check(tree);
-		//sematic_check will also produce IR-Code
+		end_time = clock();
+		cpu_time_used =((double) (end_time - start_time)) / CLOCKS_PER_SEC;
+		printf("Parsing time: %f\n", cpu_time_used);
+
+		start_time = clock();
+		int status = semantic_check(tree);
+		end_time = clock();
+		cpu_time_used =((double) (end_time - start_time)) / CLOCKS_PER_SEC;
+		printf("Sematic time: %f\n", cpu_time_used);
+
+		start_time = clock();
+		codeGen(tree, status);
+		end_time = clock();
+		cpu_time_used = ((double) (end_time - start_time)) / CLOCKS_PER_SEC;
+		printf("Sematic time: %f\n", cpu_time_used);
 	}
 
 	fclose(f);

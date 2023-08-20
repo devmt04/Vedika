@@ -1,5 +1,10 @@
-def int func(): ;
-	int a = 45
+int x = 45
+int z
+
+def int main(int c, int b):
+	int a 
 enddef
 
 
+int k
+int l = 68

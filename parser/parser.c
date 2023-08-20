@@ -133,7 +133,7 @@ ParseTree *func_decl(Token *token){
 								 / \   \
 						        /   o   \
 						       /   / \   \
-						(decl)o   ;	 NULL \
+						(decl)o   ;	 NULL \		// ; is enddef
 						  	 / \           \
                              ...            \
                                            NULL(End of funtion)
@@ -228,6 +228,7 @@ ParseTree *func_decl(Token *token){
 								free(nextToken);							
 								nextToken = lexer();
 								if(nextToken->kind == TK_ID){
+									subnt->subnontermnode = (ParseTree *)malloc(sizeof(ParseTree));
 									subnt->subnontermnode->termnode = (Node *)malloc(sizeof(Node));
 									subnt->subnontermnode->termnode->LType = LF_KW;
 									subnt->subnontermnode->termnode->value = tempTokenType;
@@ -247,6 +248,7 @@ ParseTree *func_decl(Token *token){
 									if(nextToken->kind == TK_COMMA){
 										free(nextToken);
 										nextToken = lexer();
+										subnt->nontermnode = (ParseTree *)malloc(sizeof(ParseTree));
 										subnt = subnt->nontermnode;
 										continue;
 									}else if(nextToken->kind == TK_RPAREN){
@@ -332,6 +334,8 @@ ParseTree *func_decl(Token *token){
 						*/
 
 						while(1){
+							//closing this isFIrstDExl under
+							//if cond
 							isFirstDecl++;
 							nextToken = lexer();
 							// Var-Decl
@@ -342,6 +346,7 @@ ParseTree *func_decl(Token *token){
 										declsnt = (ParseTree *)malloc(sizeof(ParseTree));
 									}
 									declsnt->subnontermnode = int_var_decl(nextToken);
+									//declsnt = int_var_decl(nextToken);
 									//declsnt->nontermnode = (ParseTree *)malloc(sizeof(ParseTree));
 									declsnt = declsnt->nontermnode;
 									continue;
@@ -355,7 +360,11 @@ ParseTree *func_decl(Token *token){
 									if(isFirstDecl != 0){
 										declsnt = (ParseTree *)malloc(sizeof(ParseTree));
 									}
-
+									/*
+									FIX THIS ISSSUE
+										
+									*/
+									//declsnt->subnontermnode = (ParseTree *)malloc(sizeof(ParseTree));
 									declsnt->termnode = (Node *)malloc(sizeof(Node));
 									declsnt->subtermnode = (Node *)malloc(sizeof(Node));
 
@@ -414,27 +423,40 @@ ParseTree *func_decl(Token *token){
 										free(nextToken);
 										exit(-1);
 									}
-
+									declsnt = NULL;
+									/*
+									declsnt = (ParseTree *)malloc(sizeof(ParseTree));
+									declsnt->subnontermnode = (ParseTree *)malloc(sizeof(ParseTree));
+									declsnt->nontermnode = NULL;
+									*/
 									free(nextToken);
 									nextToken = lexer();
+									
 									if(nextToken->kind == TK_NEWLINE || nextToken->kind == TK_EOF){
-										declsnt = NULL;
+										//declsnt->subnontermnode->termnode = (Node *)malloc(sizeof(Node));
+										//declsnt->subnontermnode->termnode->LType = LF_KW;
+										//declsnt->subnontermnode->termnode->value = KW_ENDDEF;
+										//declsnt->subnontermnode->nontermnode = NULL;
 										tree7->nontermnode = NULL;
 										return tree0;
 									}else{
-										printf("Syntax Error at %d:%d, expecting a newline char or EOF at end of funtion definaton\n", nextToken->linepos, nextToken->lineno);
+										printf("Syntax Error at %d:%d, expecting a newline char or EOF after enddef\n", nextToken->linepos, nextToken->lineno);
 										free(nextToken);
 										exit(-1);
 									}
+
+
 
 								}
 
 							}
 
+
+
 							else if(nextToken->kind == TK_ID){
 								// var initilisation
 								// ? or struct initilisation
-								// funtion calling
+								// funtion call-ing
 								if(isFirstDecl != 0){
 									declsnt = (ParseTree *)malloc(sizeof(ParseTree));
 								}
@@ -531,6 +553,7 @@ ParseTree *var_init(Token *token){
 
 		if(nextToken->kind==TK_INTLIT){ //or other datatype
 			int value = nextToken->value;
+			tree2->termnode = (Node *)malloc(sizeof(Node));
 			tree2->termnode->lineno = nextToken->lineno;
 			tree2->termnode->linepos = nextToken->linepos;
 
@@ -538,7 +561,6 @@ ParseTree *var_init(Token *token){
 			
 				case TK_INTLIT:
 					free(nextToken);
-					tree2->termnode = (Node *)malloc(sizeof(Node));
 					tree2->termnode->LType = LF_INTLIT;
 					tree2->termnode->value = value;
 					break;
@@ -672,6 +694,7 @@ ParseTree *int_var_decl(Token *token){
 			nextToken = lexer();
 			int data = nextToken->value;
 
+			// --------------------------
 			if(nextToken->kind != TK_INTLIT){
 				printf("ERROR, expecting a intlit at %d:%d in file.c\n",nextToken->lineno, nextToken->linepos);
 				exit(-1);

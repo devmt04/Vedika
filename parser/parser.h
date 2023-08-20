@@ -12,14 +12,13 @@ typedef enum {
 
 typedef enum {
 	DT_NA = 0, // uninitialized
-	DT_INT = 1,
+	DT_INT = 100,
 } DataTypes;
-
 
 typedef enum {
 	LF_KW = 1, 
 	LF_ID = 2, 
-	LF_INTLIT = 3, 
+	LF_INTLIT = DT_INT, 
 	LF_ASOP_EQ = 4, 
 	LF_AROP_PLUS = 5,
 	

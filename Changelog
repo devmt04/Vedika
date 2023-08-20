@@ -74,3 +74,7 @@
 
 
 		* Fix silly bugs
+
+6. --> Update parser, lexer, semantic-analysis, ircodegen
+
+   --> Fix a silly mistake, causing a semantic error when we declared a uninitilized variable inside a function
